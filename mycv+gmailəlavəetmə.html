@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rüfət Bekiyev - Resume</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      background-color: #0b2c47;
+      color: white;
+      width: 30%;
+      padding: 30px 20px;
+      overflow-y: auto;
+    }
+    .content {
+      background-color: #ffffff;
+      width: 70%;
+      padding: 30px;
+    }
+    .profile-img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: block;
+      border: 3px solid #ffffff55;
+      object-fit: cover;
+    }
+    .section {
+      background: #0066cc;
+      color: white;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .section h3 {
+      padding: 15px;
+      margin: 0;
+      font-size: 18px;
+      background: #004c99;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .section-content {
+      padding: 15px;
+      display: block;
+      background: #0077e0;
+    }
+    .active .section-content {
+      display: block;
+    }
+    .add-btn {
+      background: #ffffff33;
+      border: none;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .add-btn:hover {
+      background: #ffffff55;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+      color: #0b2c47;
+    }
+    h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #555;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    li, p, div {
+      margin: 6px 0;
+    }
+    form div {
+      margin-bottom: 10px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: none;
+      font-size: 14px;
+    }
+    input[type="date"] {
+      padding: 6px 8px;
+    }
+    .error {
+      color: #ffdddd;
+      background: #ff4c4c;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-top: 4px;
+      font-size: 13px;
+    }
+    button.save-btn {
+      margin-top: 10px;
+      background: #004c99;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background 0.3s ease;
+    }
+    button.save-btn:hover {
+      background: #003366;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar" id="sidebar"></div>
+  <div class="content" id="content"></div>
+
+  <script>
+    const profile = {
+      name: "Rüfət Bekiyev",
+      title: "INFORMATION SECURITY",
+      photo: "images/profile.jpg"
+    };
+
+    // Localstorage açarları
+    const STORAGE_KEY = "cvData";
+
+    // Başlanğıc data (yoxdursa localStorage-də)
+    let storedData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+      sidebar: [
+        {
+          title: "CONTACT",
+          content: [
+            "+994 055 702 15 41",
+            "rufatbekiyev@gmail.com",
+            "Nizami rayonu, Qara Qarayev"
+          ]
+        },
+        {
+          title: "EDUCATION",
+          content: [
+            "<strong>2013–2024</strong><br>Secondary Education<br>S.C.Pişavari",
+            "<strong>2024–2028</strong><br>Bachelor's Degree<br>Azerbaijan Technical UNIVERSITY"
+          ]
+        },
+        {
+          title: "SKILLS",
+          content: [
+            "<ul><li>Project Management</li><li>Teamwork</li><li>Time Management</li><li>Effective Communication</li><li>Critical Thinking</li></ul>"
+          ]
+        },
+        {
+          title: "LANGUAGES",
+          content: [
+            "<ul><li>Azerbaijani (Native)</li><li>English (B1)</li><li>Turkish (Fluent)</li><li>German (Basic)</li></ul>"
+          ]
+        }
+      ],
+      content: [
+        {
+          title: "PROFILE",
+          content: [
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eget nisi nec leo dictum tincidunt."
+          ]
+        },
+        {
+          title: "WORK EXPERIENCE",
+          content: [
+            "<strong>2024</strong><br><strong>Study.Ai</strong><br>Development Basic",
+            "<ul><li>Create AI and Develop...</li></ul>"
+          ]
+        }
+      ]
+    };
+
+    const profileFields = {
+      name: profile.name,
+      title: profile.title,
+      photo: profile.photo
+    };
+
+    // Funksiya: section yaradılması, formla birlikdə
+    function createSection(sectionObj, index, isSidebar = true) {
+      const container = document.createElement('div');
+      container.className = "section";
+
+      const header = document.createElement('h3');
+      const titleText = document.createElement('span');
+      titleText.innerHTML = sectionObj.title;
+
+      const addBtn = document.createElement('button');
+      addBtn.textContent = "+ Əlavə et";
+      addBtn.className = "add-btn";
+
+      header.appendChild(titleText);
+      header.appendChild(addBtn);
+
+      const content = document.createElement('div');
+      content.className = "section-content";
+
+      // Form elementləri
+      const form = document.createElement('form');
+      form.setAttribute('data-section-index', index);
+      form.setAttribute('data-sidebar', isSidebar);
+
+      // Daxiletmə sahələri üçün şərtlər
+      // Burada 4 əsas sahə: Ad, Email, Tarix, Təsvir
+      // Tələb olunan hissələrə görə ayrı-ayrı render edirik
+
+      // Dinamik kontent siyahısı göstər
+      const listDiv = document.createElement('div');
+      listDiv.className = "content-list";
+
+      // Hər mövcud content item üçün listdə göstər
+      sectionObj.content.forEach((item, idx) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = "content-item";
+        itemDiv.innerHTML = item;
+
+        // Dinamik silmək üçün düymə (optional)
+        const delBtn = document.createElement('button');
+        delBtn.type = "button";
+        delBtn.textContent = "Sil";
+        delBtn.style.marginLeft = "10px";
+        delBtn.style.background = "#ff4444";
+        delBtn.style.border = "none";
+        delBtn.style.color = "white";
+        delBtn.style.borderRadius = "4px";
+        delBtn.style.cursor = "pointer";
+        delBtn.style.fontSize = "12px";
+
+        delBtn.addEventListener('click', () => {
+          if (confirm("Bu məlumatı silmək istəyirsiniz?")) {
+            sectionObj.content.splice(idx, 1);
+            saveDataToLocalStorage();
+            renderAll(); // Yenidən render
+          }
+        });
+
+        itemDiv.appendChild(delBtn);
+        listDiv.appendChild(itemDiv);
+      });
+
+      form.appendChild(listDiv);
+
+      // Form sahələri əlavə etmək (Contact bölməsində nümunə)
+      if (sectionObj.title === "CONTACT") {
+        // Ad
+        const nameDiv = document.createElement('div');
+        const nameLabel = document.createElement('label');
+        nameLabel.textContent = "Ad (required):";
+        const nameInput = document.createElement('input');
+        nameInput.type = "text";
+        nameInput.name = "name";
+        nameInput.required = true;
+        nameInput.value = profileFields.name || "";
+        nameDiv.appendChild(nameLabel);
+        nameDiv.appendChild(nameInput);
+        form.appendChild(nameDiv);
+
+        // Email
+        const emailDiv = document.createElement('div');
+        const emailLabel = document.createElement('label');
+        emailLabel.textContent = "Email (required):";
+        const emailInput = document.createElement('input');
+        emailInput.type = "email";
+        emailInput.name = "email";
+        emailInput.required = true;
+        emailInput.value = sectionObj.content.find(c => c.includes("@")) || "";
+        emailDiv.appendChild(emailLabel);
+        emailDiv.appendChild(emailInput);
+        form.appendChild(emailDiv);
+
+        // Tarix
+        const dateDiv = document.createElement('div');
+        const dateLabel = document.createElement('label');
+        dateLabel.textContent = "Tarix (optional):";
+        const dateInput = document.createElement('input');
+        dateInput.type = "date";
+        dateInput.name = "date";
+        dateDiv.appendChild(dateLabel);
+        dateDiv.appendChild(dateInput);
+        form.appendChild(dateDiv);
+
+        // Təsvir
+        const descDiv = document.createElement('div');
+        const descLabel = document.createElement('label');
+        descLabel.textContent = "Təsvir:";
+        const descTextarea = document.createElement('textarea');
+        descTextarea.name = "desc";
+        descTextarea.rows = 3;
+        descTextarea.placeholder = "Qısa təsvir yazın...";
+        descDiv.appendChild(descLabel);
+        descDiv.appendChild(descTextarea);
+        form.appendChild(descDiv);
+
+        // Xəta mesajlarını göstərmək üçün yer
+        const errorDiv = document.createElement('div');
+        errorDiv.className = "error";
+        errorDiv.style.display = "none";
+        form.appendChild(errorDiv);
+
+        // Yadda saxla düyməsi
+        const saveBtn = document.createElement('button');
+        saveBtn.type = "submit";
+        saveBtn.textContent = "Yadda Saxla";
+        saveBtn.className = "save-btn";
+        form.appendChild(saveBtn);
+
+        // Form submit event
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          errorDiv.style.display = "none";
+          errorDiv.textContent = "";
+
+          // Validate fields
+          if (!nameInput.value.trim()) {
+            errorDiv.style.display = "block";
+            errorDiv.textContent = "Ad daxil edin (required).";
+            return;
+          }
+          if (!emailInput.value.trim()) {
+            errorDiv.style.display = "block";
+            errorDiv.textContent = "Email daxil edin (required).";
+            return;
+          }
+          if (!validateEmail(emailInput.value.trim())) {
+            errorDiv.style.display = "block";
+            errorDiv.textContent = "Email formatı düzgün deyil.";
+            return;
+          }
+          if (descTextarea.value.length > 500) {
+            errorDiv.style.display = "block";
+            errorDiv.textContent = "Təsvir maksimum 500 simvol ola bilər.";
+            return;
+          }
+
+          // Düzgün olanda data əlavə et
+          // Məsələn yeni məlumat form sahələri ilə bölməyə əlavə olunur
+          const newEntry = `
+            <strong>${escapeHtml(nameInput.value)}</strong><br>
+            ${escapeHtml(emailInput.value)}<br>
+            ${dateInput.value ? dateInput.value : ""}<br>
+            ${escapeHtml(descTextarea.value)}
+          `.trim();
+
+          sectionObj.content.push(newEntry);
+
+          // Boşalt form
+          nameInput.value = "";
+          emailInput.value = "";
+          dateInput.value = "";
+          descTextarea.value = "";
+
+          saveDataToLocalStorage();
+          renderAll();
+        });
+      } else {
+        // Digər bölmələrdə sadəcə list və add düyməsi var
+        addBtn.style.display = "inline-block";
+        addBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const newText = prompt("Yeni məlumat daxil edin:");
+          if (newText) {
+            sectionObj.content.push(escapeHtml(newText));
+            saveDataToLocalStorage();
+            renderAll();
+          }
+        });
+      }
+
+      container.appendChild(header);
+      container.appendChild(content);
+      content.appendChild(form);
+
+      // Toggle açılıb bağlanma
+      header.addEventListener('click', (e) => {
+        if (e.target !== addBtn) {
+          container.classList.toggle('active');
+          const sc = container.querySelector('.section-content');
+          if (sc.style.display === "block" || sc.style.display === "") {
+            sc.style.display = "none";
+          } else {
+            sc.style.display = "block";
+          }
+        }
+      });
+
+      return container;
+    }
+
+    // Email yoxlama regex funksiyası
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email.toLowerCase());
+    }
+
+    // HTML təmizləyici (basic)
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    // LocalStorage-ə yaz
+    function saveDataToLocalStorage() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(storedData));
+    }
+
+    // Səhifəni yenidən render edən funksiya
+    function renderAll() {
+      const sidebarRoot = document.getElementById('sidebar');
+      const contentRoot = document.getElementById('content');
+
+      sidebarRoot.innerHTML = "";
+      contentRoot.innerHTML = "";
+
+      // Profil şəkli
+      const img = document.createElement('img');
+      img.src = profileFields.photo;
+      img.alt = profileFields.name;
+      img.className = "profile-img";
+      sidebarRoot.appendChild(img);
+
+      // Sidebar bölmələri
+      storedData.sidebar.forEach((sec, i) => {
+        sidebarRoot.appendChild(createSection(sec, i, true));
+      });
+
+      // Ad və başlıq
+      const h1 = document.createElement('h1');
+      h1.textContent = profileFields.name;
+      const h2 = document.createElement('h2');
+      h2.textContent = profileFields.title;
+      contentRoot.appendChild(h1);
+      contentRoot.appendChild(h2);
+
+      // Content bölmələri
+      storedData.content.forEach((sec, i) => {
+        contentRoot.appendChild(createSection(sec, i, false));
+      });
+    }
+
+    // Səhifə yüklənəndə render et
+    window.onload = function () {
+      renderAll();
+    };
+
+  </script>
+</body>
+</html>
